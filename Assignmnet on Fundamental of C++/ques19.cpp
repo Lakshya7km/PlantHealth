@@ -1,8 +1,0 @@
-/*
-
-
-answer is thi code cause error because the assignment operator is used in right way but it will not making any sense
-
-
-
-*/
