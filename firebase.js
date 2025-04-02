@@ -1,53 +1,55 @@
-import React, { useState, useEffect } from "react";
-import { db } from "./firebase";
-import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { Button, Input } from "@/components/ui/button";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data UI</title>
+    <script type="module" src="firebaseConfig.js"></script>
+    <script type="module" defer>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { firebaseConfig } from "./firebaseConfig.js";
 
-export default function SensorDataUI() {
-  const [temperature, setTemperature] = useState("");
-  const [humidity, setHumidity] = useState("");
-  const [sensorData, setSensorData] = useState([]);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-  // Fetch data from Firestore
-  useEffect(() => {
-    const fetchData = async () => {
-      const querySnapshot = await getDocs(collection(db, "sensor_data"));
-      setSensorData(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    };
-    fetchData();
-  }, []);
+        async function fetchData() {
+            const querySnapshot = await getDocs(collection(db, "sensor_data"));
+            const sensorList = document.getElementById("sensor-list");
+            sensorList.innerHTML = "";
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const li = document.createElement("li");
+                li.innerHTML = `${data.temperature}°C - ${data.humidity}% <button onclick="deleteData('${doc.id}')">Delete</button>`;
+                sensorList.appendChild(li);
+            });
+        }
 
-  // Add Data to Firestore
-  const addData = async () => {
-    if (!temperature || !humidity) return;
-    await addDoc(collection(db, "sensor_data"), { temperature, humidity });
-    setTemperature("");
-    setHumidity("");
-    window.location.reload();
-  };
+        async function addData() {
+            const temperature = document.getElementById("temperature").value;
+            const humidity = document.getElementById("humidity").value;
+            if (!temperature || !humidity) return;
+            await addDoc(collection(db, "sensor_data"), { temperature, humidity });
+            document.getElementById("temperature").value = "";
+            document.getElementById("humidity").value = "";
+            fetchData();
+        }
 
-  // Delete Data from Firestore
-  const deleteData = async (id) => {
-    await deleteDoc(doc(db, "sensor_data", id));
-    window.location.reload();
-  };
+        async function deleteData(id) {
+            await deleteDoc(doc(db, "sensor_data", id));
+            fetchData();
+        }
 
-  return (
-    <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Sensor Data</h2>
-      <div className="flex space-x-2 mb-4">
-        <Input placeholder="Temperature" value={temperature} onChange={(e) => setTemperature(e.target.value)} />
-        <Input placeholder="Humidity" value={humidity} onChange={(e) => setHumidity(e.target.value)} />
-        <Button onClick={addData}>Add</Button>
-      </div>
-      <ul>
-        {sensorData.map((data) => (
-          <li key={data.id} className="flex justify-between p-2 border-b">
-            {data.temperature}°C - {data.humidity}% 
-            <Button variant="destructive" onClick={() => deleteData(data.id)}>Delete</Button>
-          </li>
-        ))}
-      </ul>
+        window.onload = fetchData;
+    </script>
+</head>
+<body>
+    <div>
+        <h2>Sensor Data</h2>
+        <input type="text" id="temperature" placeholder="Temperature" />
+        <input type="text" id="humidity" placeholder="Humidity" />
+        <button onclick="addData()">Add</button>
+        <ul id="sensor-list"></ul>
     </div>
-  );
-}
+</body>
+</html>
