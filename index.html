@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Irrigation System</title>
+</head>
+<body>
+  <h1>Irrigation Status</h1>
+  <div id="output"></div>
+
+  <script>
+    fetch("https://your-backend-url.onrender.com/irrigation_status")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("output").innerHTML = `
+          <p>🌱 Irrigation Needed: ${data.irrigation_needed}</p>
+          <p>🕒 Duration (mins): ${data.duration_minutes}</p>
+          <p>📈 Growth Stage: ${data.growth_stage}</p>
+        `;
+      });
+  </script>
+</body>
+</html>
