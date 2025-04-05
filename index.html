@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plant Growth Dashboard</title>
+    <link href="style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="text-center">🌱 Plant Growth Prediction Dashboard</h1>
+        
+        <!-- Growth Prediction -->
+        <div id="growthLoader">Loading growth data...</div>
+        <div id="growthContent" style="display: none;">
+            <h3>Growth Status</h3>
+            <p>Remaining Days: <span id="remainingDays"></span></p>
+            <p>Growth Progress: <span id="growthPercentage"></span></p>
+            <div class="progress">
+                <div class="progress-bar" id="growthProgressBar" role="progressbar" style="width: 0%;"></div>
+            </div>
+            <p>Total Days: <span id="totalGrowthDays"></span></p>
+            <p>Days Since Planting: <span id="daysSincePlanting"></span></p>
+            <p>Current Stage: <span id="currentStage"></span></p>
+            <div class="stages">
+                <span id="stage1Dot" class="dot"></span>
+                <span id="stage2Dot" class="dot"></span>
+                <span id="stage3Dot" class="dot"></span>
+            </div>
+        </div>
+
+        <!-- Irrigation -->
+        <hr>
+        <div id="irrigationLoader">Loading irrigation info...</div>
+        <div id="irrigationContent" style="display: none;">
+            <h3>Irrigation Info</h3>
+            <p id="waterStatus"></p>
+            <p>Water Duration: <span id="waterDuration"></span> mins</p>
+            <p>Irrigation Type: <span id="irrigationType"></span></p>
+            <p>Planting Area: <span id="plantingArea"></span> sq ft</p>
+            <p>Planting Date: <span id="plantingDate"></span></p>
+        </div>
+
+        <!-- Sensor Data -->
+        <hr>
+        <div id="sensorLoader">Loading sensor data...</div>
+        <div id="sensorContent" style="display: none;">
+            <h3>Sensor Data</h3>
+            <p>🌡️ Temperature: <span id="temperature"></span>°C</p>
+            <p>💧 Humidity: <span id="humidity"></span>%</p>
+            <p>💦 TDS: <span id="tdsValue"></span> ppm</p>
+            <p>⚗️ pH Level: <span id="phLevel"></span></p>
+            <p id="lastUpdated"></p>
+        </div>
+
+        <!-- Reset Section -->
+        <hr>
+        <h3>Reset Growth Cycle</h3>
+        <form id="resetForm">
+            <input type="date" id="plantingDate" required>
+            <select id="irrigationType">
+                <option value="drip">Drip</option>
+                <option value="sprinkler">Sprinkler</option>
+                <option value="borewell">Borewell</option>
+            </select>
+            <input type="number" id="plantingArea" placeholder="Area in sq ft" required>
+            <input type="text" id="plantId" placeholder="Plant ID" required>
+            <button type="submit" class="btn btn-primary">Reset</button>
+        </form>
+        <div id="resetSuccess" style="display: none;" class="alert alert-success">Cycle reset successfully!</div>
+        <div id="resetError" style="display: none;" class="alert alert-danger"></div>
+
+        <!-- Refresh Button -->
+        <button id="refreshBtn" class="btn btn-secondary mt-3">🔄 Refresh Dashboard</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
