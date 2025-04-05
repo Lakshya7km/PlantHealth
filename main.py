@@ -6,8 +6,10 @@ from datetime import datetime
 app = FastAPI()
 
 # Supabase connection
-url = "https://lcmsxmciopzkdldekbmw.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjbXN4bWNpb3B6a2RsZGVrYm13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2OTk2MTgsImV4cCI6MjA1OTI3NTYxOH0.mPPJbRQNN-rNLnZfMEpJ2siWgD9TtnWnEYj91broSMA"
+import os
+
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
 
 supabase: Client = create_client(url, key)
 
