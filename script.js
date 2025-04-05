@@ -1,4 +1,4 @@
-const API_URL = 'https://your-render-app.onrender.com';
+const API_URL = 'https://plantlstmmodel.onrender.com';
 
 function formatDate(dateString) {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
