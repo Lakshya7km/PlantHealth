@@ -5,17 +5,21 @@
 </head>
 <body>
   <h1>Irrigation Status</h1>
-  <div id="output"></div>
+  <div id="output">Loading...</div>
 
   <script>
-    fetch("https://your-backend-url.onrender.com/irrigation_status")
+    fetch("https://plantlstmmodel.onrender.com/irrigation")
       .then(res => res.json())
       .then(data => {
         document.getElementById("output").innerHTML = `
-          <p>🌱 Irrigation Needed: ${data.irrigation_needed}</p>
-          <p>🕒 Duration (mins): ${data.duration_minutes}</p>
-          <p>📈 Growth Stage: ${data.growth_stage}</p>
+          <p>🌱 <strong>Irrigation Needed:</strong> ${data.irrigation_needed}</p>
+          <p>🕒 <strong>Duration (mins):</strong> ${data.duration_minutes}</p>
+          <p>📈 <strong>Growth Stage:</strong> ${data.growth_stage}</p>
         `;
+      })
+      .catch(err => {
+        document.getElementById("output").innerHTML = "❌ Error fetching data.";
+        console.error(err);
       });
   </script>
 </body>
