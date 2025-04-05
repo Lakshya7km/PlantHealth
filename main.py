@@ -68,3 +68,22 @@ def calculate_irrigation():
         "duration_minutes": round(adjusted_time, 2),
         "growth_stage": stage
     }
+    from pydantic import BaseModel
+import uuid
+
+class PlantingInput(BaseModel):
+    irrigation_type: str
+    planting_area: int
+
+@app.post("/manual-input")
+def manual_input(data: PlantingInput):
+    new_entry = {
+        "id": str(uuid.uuid4()),
+        "plant_id": "plant_1",
+        "planting_date": datetime.now().isoformat(),
+        "irrigation_type": data.irrigation_type,
+        "planting_area": data.planting_area
+    }
+    supabase.table("planting_info").insert(new_entry).execute()
+    return {"message": "✅ Manual input saved!"}
+
