@@ -1,30 +1,34 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from supabase import create_client, Client
 from datetime import datetime
+import uuid
 import os
 
 app = FastAPI()
 
-# Supabase connection
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+# Supabase credentials
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# Test route
 @app.get("/")
 def home():
     return {"message": "✅ API working!"}
 
+# Irrigation calculation route
 @app.get("/irrigation")
 def calculate_irrigation():
-    # 1. Fetch latest sensor data
     sensor_res = supabase.table("sensor_data").select("*").order("timestamp", desc=True).limit(1).execute()
-    sensor = sensor_res.data[0]
-
-    # 2. Fetch latest planting info
     planting_res = supabase.table("planting_info").select("*").order("planting_date", desc=True).limit(1).execute()
+
+    if not sensor_res.data or not planting_res.data:
+        return {"error": "No data available for irrigation calculation."}
+
+    sensor = sensor_res.data[0]
     planting = planting_res.data[0]
 
-    # 3. Calculate growth stage
     planting_date = datetime.fromisoformat(planting["planting_date"])
     now = datetime.now()
     growth_days = (now - planting_date).days
@@ -38,11 +42,10 @@ def calculate_irrigation():
     else:
         stage = "Maturity"
 
-    # 4. Calculate irrigation need
     temperature = sensor["temperature"]
     humidity = sensor["humidity"]
     irrigation_type = planting["irrigation_type"]
-    area = planting["planting_area"]
+    area = float(planting["planting_area"])
 
     irrigation_needed = humidity < 65 or temperature > 28
 
@@ -68,22 +71,22 @@ def calculate_irrigation():
         "duration_minutes": round(adjusted_time, 2),
         "growth_stage": stage
     }
-    from pydantic import BaseModel
-import uuid
 
+# Manual input data model
 class PlantingInput(BaseModel):
     irrigation_type: str
-    planting_area: int
+    planting_area: float  # Use float because numeric in Supabase allows decimals
 
+# Save manual input to planting_info
 @app.post("/manual-input")
 def manual_input(data: PlantingInput):
     new_entry = {
         "id": str(uuid.uuid4()),
         "plant_id": "plant_1",
-        "planting_date": datetime.now().isoformat(),
+        "planting_date": datetime.now().date().isoformat(),
         "irrigation_type": data.irrigation_type,
         "planting_area": data.planting_area
     }
+
     supabase.table("planting_info").insert(new_entry).execute()
     return {"message": "✅ Manual input saved!"}
-
