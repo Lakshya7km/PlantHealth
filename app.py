@@ -798,4 +798,7 @@ def add_sensor_data():
         return f"<script>alert('Error: {str(e)}'); window.location.href='/'</script>"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))  # Render sets PORT dynamically
+    app.run(host='0.0.0.0', port=port)
+
