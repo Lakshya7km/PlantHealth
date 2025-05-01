@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Agriculture Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #8BC34A;
+            --dark-green: #1B5E20; /* Darker green for better contrast */
+            --light-beige: #F5F5DC;
+            --earth-brown: #8D6E63;
+            --sky-blue: #1976D2; /* Darker blue for better contrast */
+            --water-blue: #0277BD; /* Darker blue for better contrast */
+            --soil-brown: #685853; /* Darker brown for better contrast */
+            --leaf-green: #2E7D32; /* Darker leaf green for better contrast */
+            --sun-yellow: #F57F17; /* Darker yellow for better contrast */
+        }
+
+        body {
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 18px;
+            border: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .sensor-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: #333;
+            letter-spacing: 0.5px;
+        }
+        
+        .sensor-icon {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .sensor-card {
+            border-radius: 16px;
+            padding: 1.2rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sensor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sensor-card:hover .sensor-icon {
+            transform: scale(1.1);
+        }
+
+        .card-header {
+            font-weight: bold;
+            border-bottom: none;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            color: white;
+            background-color: #2c3e50 !important; /* Darker background for better visibility */
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            border-radius: 15px 15px 0 0;
+        }
+
+        /* Accent colors for different card types */
+        .card-header.bg-primary-green {
+            background-color: var(--primary-green) !important;
+            border-left: 5px solid var(--dark-green);
+        }
+
+        .card-header.bg-leaf-green {
+            background-color: var(--leaf-green) !important;
+            border-left: 5px solid var(--dark-green);
+        }
+
+        .card-header.bg-water-blue {
+            background-color: var(--water-blue) !important;
+            border-left: 5px solid var(--sky-blue);
+        }
+
+        .card-header.bg-sky-blue {
+            background-color: var(--sky-blue) !important;
+            border-left: 5px solid var(--water-blue);
+        }
+
+        .card-header.bg-dark-green {
+            background-color: var(--dark-green) !important;
+            border-left: 5px solid var(--primary-green);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .btn-action {
+            width: 100%;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-action:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-action i {
+            font-size: 1.2rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-green);
+            border-color: var(--dark-green);
+        }
+
+        .btn-success {
+            background-color: var(--leaf-green);
+            border-color: var(--leaf-green);
+        }
+
+        .btn-success:hover {
+            background-color: var(--dark-green);
+            border-color: var(--dark-green);
+        }
+
+        .btn-info {
+            background-color: var(--water-blue);
+            border-color: var(--water-blue);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #0288D1;
+            border-color: #0288D1;
+            color: white;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .loading-spinner {
+            display: none;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .icon-temp {
+            color: #FF5722;
+        }
+
+        .icon-humidity {
+            color: var(--water-blue);
+        }
+
+        .icon-ph {
+            color: #9C27B0;
+        }
+
+        .icon-soil {
+            color: var(--soil-brown);
+        }
+
+        .icon-light {
+            color: var(--sun-yellow);
+        }
+
+        .icon-co2 {
+            color: #607D8B;
+        }
+
+        /* Form styling */
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Progress indicators */
+        .growth-progress {
+            height: 15px;
+            border-radius: 10px;
+            background-color: #e9ecef;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .growth-progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--light-green), var(--primary-green), var(--dark-green));
+            transition: width 1s ease;
+        }
+
+        /* Tooltips */
+        .tooltip-icon {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-left: 5px;
+            cursor: help;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .dashboard-title {
+                font-size: 1.8rem;
+            }
+            
+            .sensor-value {
+                font-size: 1.5rem;
+            }
+            
+            .card-header {
+                font-size: 1.1rem;
+                padding: 12px 15px;
+            }
+            
+            .sensor-card {
+                padding: 1rem;
+            }
+            
+            .sensor-icon {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-title {
+                font-size: 1.6rem;
+            }
+            
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .row {
+                margin-left: -5px;
+                margin-right: -5px;
+            }
+            
+            .col-md-3, .col-md-4, .col-md-6, .col-md-8, .col-md-12 {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+            
+            .card {
+                margin-bottom: 15px;
+            }
+            
+            .card-body {
+                padding: 15px;
+            }
+            
+            .btn-action {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .btn-action i {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-title {
+                font-size: 1.4rem;
+            }
+            
+            .sensor-value {
+                font-size: 1.3rem;
+            }
+            
+            .sensor-icon {
+                font-size: 1.5rem;
+            }
+            
+            .card-header {
+                font-size: 1rem;
+                padding: 10px 12px;
+            }
+            
+            .card-body {
+                padding: 12px;
+            }
+            
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .btn-action {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+                margin-bottom: 8px;
+            }
+            
+            .bg-element {
+                display: none; /* Hide background elements on very small screens */
+            }
+        }
+
+        /* Animated background elements */
+        .bg-element {
+            position: fixed;
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: -1;
+            pointer-events: auto;
+        }
+
+        /* Night mode styles */
+        body.night-mode {
+            background-color: #1a2639;
+            color: #f0f0f0;
+            transition: all 0.5s ease;
+        }
+
+        body.night-mode .card {
+            background-color: rgba(40, 50, 70, 0.95);
+            border-color: #3a4a5a;
+        }
+
+        body.night-mode .card-header:not(.bg-primary-green):not(.bg-leaf-green):not(.bg-water-blue):not(.bg-sky-blue) {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+
+        body.night-mode .form-control, body.night-mode .form-select {
+            background-color: #2c3e50;
+            border-color: #34495e;
+            color: #ecf0f1;
+        }
+
+        body.night-mode .text-muted {
+            color: #a0aec0 !important;
+        }
+
+        body.night-mode .bg-sun {
+            background-image: url('https://www.svgrepo.com/show/33577/moon.svg');
+        }
+
+        .bg-leaf {
+            width: 100px;
+            height: 100px;
+            background-image: url('https://www.svgrepo.com/show/530661/leaf.svg');
+            opacity: 0.1;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .bg-sun {
+            width: 150px;
+            height: 150px;
+            background-image: url('https://www.svgrepo.com/show/475692/sun.svg');
+            top: 50px;
+            right: 100px;
+            opacity: 0.15;
+            animation: rotate 60s infinite linear, pulse 10s infinite ease-in-out;
+        }
+
+        .bg-cloud {
+            width: 180px;
+            height: 100px;
+            background-image: url('https://www.svgrepo.com/show/486370/cloud.svg');
+            opacity: 0.1;
+            animation: drift 40s infinite linear;
+        }
+
+        .bg-windmill {
+            width: 120px;
+            height: 200px;
+            background-image: url('https://www.svgrepo.com/show/61092/windmill.svg');
+            bottom: 20px;
+            right: 50px;
+            opacity: 0.12;
+        }
+
+        .bg-windmill::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-image: url('https://www.svgrepo.com/show/416435/windmill-propeller.svg');
+            top: 20px;
+            left: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: rotate 8s infinite linear;
+            transform-origin: center center;
+        }
+
+        .bg-windmill.windmill-spin::after {
+            animation: rotate 1s infinite linear;
+        }
+
+        .bg-farmer {
+            width: 150px;
+            height: 200px;
+            background-image: url('https://www.svgrepo.com/show/521064/farmer.svg');
+            bottom: 20px;
+            left: 50px;
+            opacity: 0.15;
+            animation: bounce 4s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(10px, 10px) rotate(5deg); }
+            50% { transform: translate(0, 20px) rotate(0deg); }
+            75% { transform: translate(-10px, 10px) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.15; }
+            50% { transform: scale(1.1); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.15; }
+        }
+
+        @keyframes drift {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Toast notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--dark-green);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            font-weight: 500;
+        }
+
+        /* Tab styling */
+        .nav-tabs .nav-link {
+            color: #555;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--dark-green);
+            background-color: #fff;
+            border-bottom: 3px solid var(--primary-green);
+        }
+
+        .tab-content {
+            background-color: #fff;
+            border-radius: 0 0 10px 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background elements -->
+    <div class="bg-element bg-sun"></div>
+    <div class="bg-element bg-cloud" style="top: 15%;"></div>
+    <div class="bg-element bg-cloud" style="top: 30%; animation-delay: 15s;"></div>
+    <div class="bg-element bg-windmill"></div>
+    <div class="bg-element bg-farmer"></div>
+    <div class="bg-element bg-leaf" style="top: 10%; left: 5%;"></div>
+    <div class="bg-element bg-leaf" style="top: 30%; right: 8%; transform: rotate(45deg);"></div>
+    <div class="bg-element bg-leaf" style="bottom: 15%; left: 10%; transform: rotate(-30deg);"></div>
+
+    <div class="container py-4 animate__animated animate__fadeIn">
+        <div class="row mb-4">
+            <div class="col-md-12 text-center">
+                <h1 class="dashboard-title"><i class="bi bi-flower1 me-2 text-success"></i>Smart Agriculture Dashboard</h1>
+                <p class="text-muted">Monitor and optimize your plant growth with smart IoT sensors</p>
+            </div>
+        </div>
+
+        <!-- Current Conditions Card -->
+        {% if current_conditions %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card animate__animated animate__fadeInUp">
+                    <div class="card-header bg-light-green text-white">
+                        <i class="bi bi-broadcast-pin me-2"></i> Current Sensor Readings
+                        <span class="badge bg-light text-dark float-end animate__animated animate__pulse animate__infinite"><i class="bi bi-clock me-1"></i>Updated: {{ current_conditions.timestamp[:16] }}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-lg-3 col-md-6 col-sm-6 text-center">
+                                <div class="sensor-card p-3 rounded-3 h-100" style="background-color: rgba(255, 87, 34, 0.1);">
+                                    <i class="bi bi-thermometer-half sensor-icon icon-temp"></i>
+                                    <div class="fw-bold mb-2">Temperature <i class="bi bi-info-circle-fill tooltip-icon" data-bs-toggle="tooltip" title="Current air temperature around your plants"></i></div>
+                                    <div class="sensor-value">{{ current_conditions.temperature }} <span class="fs-6">°C</span></div>
+                                    <div class="small text-muted mt-2">Optimal: 20-30°C</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 text-center">
+                                <div class="sensor-card p-3 rounded-3 h-100" style="background-color: rgba(41, 182, 246, 0.1);">
+                                    <i class="bi bi-droplet-fill sensor-icon icon-humidity"></i>
+                                    <div class="fw-bold mb-2">Humidity <i class="bi bi-info-circle-fill tooltip-icon" data-bs-toggle="tooltip" title="Relative humidity in the air"></i></div>
+                                    <div class="sensor-value">{{ current_conditions.humidity }} <span class="fs-6">%</span></div>
+                                    <div class="small text-muted mt-2">Optimal: 50-70%</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 text-center">
+                                <div class="sensor-card p-3 rounded-3 h-100" style="background-color: rgba(156, 39, 176, 0.1);">
+                                    <i class="bi bi-water sensor-icon icon-ph"></i>
+                                    <div class="fw-bold mb-2">pH Level <i class="bi bi-info-circle-fill tooltip-icon" data-bs-toggle="tooltip" title="Acidity/alkalinity of soil or water"></i></div>
+                                    <div class="sensor-value">{{ current_conditions.ph_level }}</div>
+                                    <div class="small text-muted mt-2">Optimal: 6.0-7.0</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 text-center">
+                                <div class="sensor-card p-3 rounded-3 h-100" style="background-color: rgba(96, 125, 139, 0.1);">
+                                    <i class="bi bi-cloud sensor-icon icon-co2"></i>
+                                    <div class="fw-bold mb-2">CO₂ Level <i class="bi bi-info-circle-fill tooltip-icon" data-bs-toggle="tooltip" title="Carbon dioxide concentration"></i></div>
+                                    <div class="sensor-value">{% if current_conditions.co2_ppm %}{{ current_conditions.co2_ppm }} <span class="fs-6">ppm</span>{% else %}--{% endif %}</div>
+                                    <div class="small text-muted mt-2">Optimal: 400-1000 ppm</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-4 mt-3">
+                            <div class="col-lg-3 col-md-6 col-sm-6 text-center">
+                                <div class="sensor-card p-3 rounded-3 h-100" style="background-color: rgba(121, 85, 72, 0.1);">
+                                    <i class="bi bi-moisture sensor-icon icon-soil"></i>
+                                    <div class="fw-bold mb-2">Soil Moisture <i class="bi bi-info-circle-fill tooltip-icon" data-bs-toggle="tooltip" title="Water content in the soil"></i></div>
+                                    <div class="sensor-value">{% if current_conditions.soil %}{{ current_conditions.soil }}{% else %}--{% endif %}</div>
+                                    <div class="small text-muted mt-2">Optimal: 40-60%</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 text-center">
+                                <div class="sensor-card p-3 rounded-3 h-100" style="background-color: rgba(76, 175, 80, 0.1);">
+                                    <i class="bi bi-check2-circle sensor-icon" style="color: var(--primary-green);"></i>
+                                    <div class="fw-bold mb-2">Soil Status <i class="bi bi-info-circle-fill tooltip-icon" data-bs-toggle="tooltip" title="Current soil condition"></i></div>
+                                    <div class="sensor-value">{% if current_conditions.soil_status %}{{ current_conditions.soil_status }}{% else %}--{% endif %}</div>
+                                    <div class="small text-muted mt-2">Ideal: Medium</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 text-center">
+                                <div class="sensor-card p-3 rounded-3 h-100" style="background-color: rgba(96, 125, 139, 0.1);">
+                                    <i class="bi bi-activity sensor-icon" style="color: #FF9800;"></i>
+                                    <div class="fw-bold mb-2">CO₂ Status <i class="bi bi-info-circle-fill tooltip-icon" data-bs-toggle="tooltip" title="Carbon dioxide level status"></i></div>
+                                    <div class="sensor-value">{% if current_conditions.co2_status %}{{ current_conditions.co2_status }}{% else %}--{% endif %}</div>
+                                    <div class="small text-muted mt-2">Ideal: Normal</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 text-center">
+                                <div class="sensor-card p-3 rounded-3 h-100" style="background-color: rgba(255, 193, 7, 0.1);">
+                                    <i class="bi bi-brightness-high-fill sensor-icon icon-light"></i>
+                                    <div class="fw-bold mb-2">Light <i class="bi bi-info-circle-fill tooltip-icon" data-bs-toggle="tooltip" title="Light intensity level"></i></div>
+                                    <div class="sensor-value">{% if current_conditions.light %}{{ current_conditions.light }}{% else %}--{% endif %}</div>
+                                    <div class="small text-muted mt-2">Optimal: 5000-10000 lux</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row mt-4">
+            <!-- Main content - Sensor data -->
+            <div class="col-lg-8 col-md-12">
+                <div class="card animate__animated animate__fadeInLeft">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-table me-2"></i> Recent Sensor Readings
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-light" data-bs-toggle="tooltip" title="Refresh data"><i class="bi bi-arrow-clockwise"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><i class="bi bi-calendar3 me-1 text-muted"></i> Timestamp</th>
+                                        <th><i class="bi bi-thermometer-half me-1 text-danger"></i> Temp (°C)</th>
+                                        <th><i class="bi bi-droplet-fill me-1 text-primary"></i> Humidity (%)</th>
+                                        <th><i class="bi bi-water me-1 text-purple"></i> pH Level</th>
+                                        <th><i class="bi bi-moisture me-1 text-brown"></i> Soil</th>
+                                        <th><i class="bi bi-check2-circle me-1 text-success"></i> Soil Status</th>
+                                        <th><i class="bi bi-cloud me-1 text-secondary"></i> CO₂ (ppm)</th>
+                                        <th><i class="bi bi-activity me-1 text-warning"></i> CO₂ Status</th>
+                                        <th><i class="bi bi-brightness-high-fill me-1 text-warning"></i> Light</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in sensor_data %}
+                                    <tr>
+                                        <td>{{ record.timestamp_display }}</td>
+                                        <td>{{ record.temperature }}</td>
+                                        <td>{{ record.humidity }}</td>
+                                        <td>{{ record.ph_level }}</td>
+                                        <td>{{ record.soil }}</td>
+                                        <td>
+                                            {% if record.soil_status == 0 %}
+                                            <span class="badge bg-danger">Dry</span>
+                                            {% elif record.soil_status == 1 %}
+                                            <span class="badge bg-warning">Medium</span>
+                                            {% elif record.soil_status == 2 %}
+                                            <span class="badge bg-success">Wet</span>
+                                            {% else %}
+                                            {{ record.soil_status }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ record.co2_ppm }}</td>
+                                        <td>
+                                            {% if record.co2_status == 0 %}
+                                            <span class="badge bg-success">Good</span>
+                                            {% elif record.co2_status == 1 %}
+                                            <span class="badge bg-warning">Moderate</span>
+                                            {% elif record.co2_status == 2 %}
+                                            <span class="badge bg-danger">High</span>
+                                            {% else %}
+                                            {{ record.co2_status }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ record.light }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Prediction Results -->
+                <div class="card result-section animate__animated animate__fadeIn" id="prediction-results-section">
+                    <div class="card-header bg-leaf-green text-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-graph-up me-2"></i> Next Day Growth Prediction
+                        </div>
+                        <div>
+                            <span class="badge bg-light text-dark"><i class="bi bi-calendar-check me-1"></i> AI Powered</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6 col-sm-12 mb-3 mb-md-0">
+                                <div class="sensor-card" style="background-color: rgba(144, 202, 249, 0.1);">
+                                    <h6 class="border-bottom pb-2 text-primary">Today</h6>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-thermometer-half text-danger me-2"></i>
+                                        <span>Temperature: <span id="current-growth-temp" class="fw-bold"></span>°C</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-droplet-fill text-primary me-2"></i>
+                                        <span>Humidity: <span id="current-growth-humidity" class="fw-bold"></span>%</span>
+                                    </div>
+                                    <!-- Growth rate hidden as requested -->
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="sensor-card" style="background-color: rgba(144, 202, 249, 0.1);">
+                                    <h6 class="border-bottom pb-2 text-primary">Tomorrow</h6>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-calendar-date text-secondary me-2"></i>
+                                        <span>Date: <span id="prediction-growth-date" class="fw-bold"></span></span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-thermometer-half text-danger me-2"></i>
+                                        <span>Temperature: <span id="prediction-growth-temp" class="fw-bold"></span>°C</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-droplet-fill text-primary me-2"></i>
+                                        <span>Humidity: <span id="prediction-growth-humidity" class="fw-bold"></span>%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info border-start border-4">
+                            <div class="d-flex">
+                                <div class="me-3 fs-3"><i class="bi bi-lightbulb-fill text-warning"></i></div>
+                                <div>
+                                    <strong>How this works:</strong> Our AI model analyzes historical sensor data to predict tomorrow's growth rate based on optimal growing conditions where temperature (25°C) and humidity (60%) are ideal for most plants.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Results -->
+                <div class="card result-section animate__animated animate__fadeIn" id="training-results-section">
+                    <div class="card-header bg-primary-green text-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-activity me-2"></i> Model Training Results
+                        </div>
+                        <div>
+                            <span class="badge bg-light text-dark"><i class="bi bi-cpu me-1"></i> Machine Learning</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success" id="training-message">
+                            Model trained successfully!
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card text-center bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">MSE</h5>
+                                        <p class="display-6" id="mse-value">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">MAE</h5>
+                                        <p class="display-6" id="mae-value">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">R²</h5>
+                                        <p class="display-6" id="r2-value">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4">Training History</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">Loss</div>
+                                    <div class="card-body">
+                                        <canvas id="lossChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">Mean Absolute Error</div>
+                                    <div class="card-body">
+                                        <canvas id="maeChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Information Section -->
+                <div class="card mt-4 animate__animated animate__fadeInUp">
+                    <div class="card-header bg-primary-green text-white">
+                        <i class="bi bi-cpu me-2"></i> AI Model Information
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>How Our AI Works</h5>
+                                <div class="p-3 rounded-3 mb-3" style="background-color: rgba(76, 175, 80, 0.05); border-left: 4px solid var(--primary-green);">
+                                    <p><strong>What is it?</strong> Our system uses a type of AI called LSTM (Long Short-Term Memory) that's great at learning patterns over time.</p>
+                                    <p><strong>How it works:</strong></p>
+                                    <ul>
+                                        <li><i class="bi bi-1-circle-fill me-2 text-success"></i> <strong>Learning from history:</strong> The model analyzes 30 days of sensor data (temperature, humidity, pH) to understand patterns.</li>
+                                        <li><i class="bi bi-2-circle-fill me-2 text-success"></i> <strong>Finding connections:</strong> It discovers how these factors relate to each other and change over time.</li>
+                                        <li><i class="bi bi-3-circle-fill me-2 text-success"></i> <strong>Making predictions:</strong> Based on these patterns, it predicts tomorrow's temperature and humidity.</li>
+                                    </ul>
+                                    <p><strong>Why it matters:</strong> These predictions help optimize watering schedules and growing conditions for healthier plants.</p>
+                                </div>
+                                
+                                <h5 class="mb-3"><i class="bi bi-graph-up me-2 text-primary"></i>Model Status</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span><strong>Model Trained:</strong></span>
+                                    <span class="badge {% if model_exists %}bg-success{% else %}bg-danger{% endif %} p-2">
+                                        {% if model_exists %}
+                                        <i class="bi bi-check-circle me-1"></i> Yes
+                                        {% else %}
+                                        <i class="bi bi-x-circle me-1"></i> No
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                <div class="alert alert-info">
+                                    <i class="bi bi-lightbulb me-2"></i> <strong>Tip:</strong> For best results, train the model after collecting at least 30 days of sensor data. More data means better predictions!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Water Calculator Results -->
+                <div class="card result-section animate__animated animate__fadeIn" id="water-results-section">
+                    <div class="card-header bg-water-blue text-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-droplet-fill me-2"></i> Smart Irrigation Recommendation
+                        </div>
+                        <div>
+                            <span class="badge bg-light text-dark"><i class="bi bi-moisture me-1"></i> Water-Saving</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="card-title mb-0">Weather Forecast</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>Today</h6>
+                                                <p>Temperature: <span id="current-temp" class="fw-bold"></span>°C</p>
+                                                <p>Humidity: <span id="current-humidity" class="fw-bold"></span>%</p>
+                                                <p>Weather: <span id="current-weather" class="fw-bold"></span></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Tomorrow <span class="badge bg-info" id="prediction-source"></span></h6>
+                                                <p>Date: <span id="prediction-date" class="fw-bold"></span></p>
+                                                <p>Temperature: <span id="prediction-temp" class="fw-bold"></span>°C</p>
+                                                <p>Humidity: <span id="prediction-humidity" class="fw-bold"></span>%</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="card-title mb-0">Irrigation Recommendation</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><i class="bi bi-droplet"></i> Water Required: <span id="water-required" class="fw-bold"></span> liters</p>
+                                                <p><i class="bi bi-clock"></i> Duration: <span id="duration-minutes" class="fw-bold"></span> minutes</p>
+                                                <p><i class="bi bi-sun"></i> Best Time: <span id="optimal-time" class="fw-bold"></span></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><i class="bi bi-calendar-check"></i> Frequency: <span id="frequency" class="fw-bold"></span></p>
+                                                <p><i class="bi bi-123"></i> Sessions: <span id="sessions" class="fw-bold"></span></p>
+                                                <p><i class="bi bi-hourglass-split"></i> Per Session: <span id="session-duration" class="fw-bold"></span> min</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h5 class="card-title mb-0">Crop Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Type: <span id="crop-info-type" class="fw-bold"></span></p>
+                                        <p>Growth Stage: <span id="crop-info-stage" class="fw-bold"></span></p>
+                                        <p>Base Water Need: <span id="crop-info-water" class="fw-bold"></span> mm/day</p>
+                                        <p>Soil Type: <span id="soil-info-type" class="fw-bold"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="card-title mb-0">Tips</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul id="irrigation-tips">
+                                            <li>Water early in the morning to reduce evaporation</li>
+                                            <li>Check soil moisture before watering</li>
+                                            <li>Adjust watering based on rainfall</li>
+                                            <li>Consider using mulch to retain moisture</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar with controls -->
+            <div class="col-lg-4 col-md-12">
+                <!-- Manual Sensor Data Input Form -->
+                <div class="card animate__animated animate__fadeInRight">
+                    <div class="card-header">
+                        <div>
+                            <i class="bi bi-input-cursor-text me-2"></i> Sensor Data Management
+                            <i class="bi bi-info-circle-fill tooltip-icon text-white" data-bs-toggle="tooltip" title="Add sensor readings manually or schedule automatic collection"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="sensorDataTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab" aria-controls="manual" aria-selected="true">Manual Input</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab" aria-controls="schedule" aria-selected="false">Daily Schedule</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content pt-3" id="sensorDataTabContent">
+                            <div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+                                <form action="/add_sensor_data" method="POST">
+                                    <div class="mb-3">
+                                        <label for="temperature" class="form-label">Temperature (°C):</label>
+                                        <input type="number" step="0.1" name="temperature" id="temperature" class="form-control" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="humidity" class="form-label">Humidity (%):</label>
+                                        <input type="number" step="0.1" name="humidity" id="humidity" class="form-control" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="ph_level" class="form-label">pH Level:</label>
+                                        <input type="number" step="0.1" name="ph_level" id="ph_level" class="form-control" required>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-cloud-upload"></i> Submit Data
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <button type="button" id="train-after-submit" class="btn btn-outline-success btn-sm">
+                                            <i class="bi bi-cpu"></i> Train After Submit
+                                        </button>
+                                        <button type="button" id="predict-after-submit" class="btn btn-outline-info btn-sm">
+                                            <i class="bi bi-graph-up"></i> Predict After Submit
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
+                                <form id="schedule-collection-form">
+                                    <div class="mb-3">
+                                        <label for="collection-time" class="form-label">Collection Time</label>
+                                        <input type="time" class="form-control" id="collection-time" value="08:00" required>
+                                    </div>
+
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="auto-train" checked>
+                                        <label class="form-check-label" for="auto-train">
+                                            Auto-train model after collection
+                                        </label>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-calendar-check"></i> Schedule Daily Collection
+                                        </button>
+                                    </div>
+                                </form>
+                                <div class="alert alert-info mt-3" id="schedule-status" style="display: none;">
+                                    <i class="bi bi-info-circle"></i> <span id="schedule-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Controls -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-cpu"></i> Model Controls
+                    </div>
+                    <div class="card-body">
+                        <button id="train-model-btn" class="btn btn-primary btn-action">
+                            <i class="bi bi-boxes"></i> Train Model
+                        </button>
+
+                        <div class="d-flex justify-content-center mt-2 loading-spinner" id="model-spinner">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-danger mt-3 d-none" id="model-error">
+                            Error message will appear here.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Watering Tool -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-droplet"></i> Advanced Irrigation Scheduler
+                    </div>
+                    <div class="card-body">
+                        <form id="water-calculator-form">
+                            <div class="mb-3">
+                                <label for="irrigation-type" class="form-label">Irrigation Type</label>
+                                <select class="form-select" id="irrigation-type" required>
+                                    <option value="Drip">Drip</option>
+                                    <option value="Sprinkler">Sprinkler</option>
+                                    <option value="Flood">Flood</option>
+                                    <option value="Micro-sprinkler">Micro-sprinkler</option>
+                                    <option value="Subsurface">Subsurface</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="area" class="form-label">Area (m²)</label>
+                                <input type="number" class="form-control" id="area" min="1" max="10000" value="100" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="crop-type" class="form-label">Crop Type</label>
+                                <select class="form-select" id="crop-type" required>
+                                    {% for crop in crop_types %}
+                                    <option value="{{ crop }}">{{ crop }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="growth-stage" class="form-label">Growth Stage</label>
+                                <select class="form-select" id="growth-stage">
+                                    <option value="early">Early</option>
+                                    <option value="mid" selected>Mid</option>
+                                    <option value="late">Late</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="soil-type" class="form-label">Soil Type</label>
+                                <select class="form-select" id="soil-type">
+                                    <option value="Sandy">Sandy</option>
+                                    <option value="Loamy" selected>Loamy</option>
+                                    <option value="Clay">Clay</option>
+                                    <option value="Silt">Silt</option>
+                                    <option value="Peat">Peat</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="weather-condition" class="form-label">Weather Condition</label>
+                                <select class="form-select" id="weather-condition">
+                                    <option value="Sunny">Sunny</option>
+                                    <option value="Partly Cloudy" selected>Partly Cloudy</option>
+                                    <option value="Cloudy">Cloudy</option>
+                                    <option value="Rainy">Rainy</option>
+                                    <option value="Windy">Windy</option>
+                                </select>
+                            </div>
+
+
+
+                            <button type="submit" class="btn btn-info btn-action">
+                                <i class="bi bi-droplet"></i> Calculate Tomorrow's Water Needs
+                            </button>
+
+                            <div class="d-flex justify-content-center mt-2 loading-spinner" id="water-spinner">
+                                <div class="spinner-border text-info" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+
+            // Add animated background leaves
+            addBackgroundLeaves();
+        });
+
+        // Function to add random animated elements to the background
+        function addBackgroundLeaves() {
+            const leafCount = 5;
+            const container = document.body;
+
+            // Add random leaves
+            for (let i = 0; i < leafCount; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'bg-element bg-leaf';
+                leaf.style.top = Math.random() * 100 + '%';
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.transform = `rotate(${Math.random() * 360}deg)`;
+                leaf.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(leaf);
+            }
+
+            // Add interactive elements
+            makeBackgroundElementsInteractive();
+        }
+
+        // Make background elements interactive
+        function makeBackgroundElementsInteractive() {
+            // Get sun element once
+            const sun = document.querySelector('.bg-sun');
+            if (sun) {
+                sun.style.cursor = 'pointer';
+
+                // Add click handler for sun to toggle day/night mode
+                sun.addEventListener('click', function() {
+                    document.body.classList.toggle('night-mode');
+
+                    // Show a toast notification
+                    showToast(document.body.classList.contains('night-mode') ?
+                        '🌙 Night mode activated' :
+                        '☀️ Day mode activated');
+                });
+            }
+
+            // Make elements react to mouse movement
+            document.addEventListener('mousemove', function(e) {
+                const mouseX = e.clientX / window.innerWidth;
+                const mouseY = e.clientY / window.innerHeight;
+
+                // Move sun slightly with mouse
+                if (sun) {
+                    sun.style.transform = `translate(${(mouseX - 0.5) * -20}px, ${(mouseY - 0.5) * -20}px)`;
+                }
+
+                // Move clouds with mouse
+                const clouds = document.querySelectorAll('.bg-cloud');
+                clouds.forEach(cloud => {
+                    cloud.style.transform = `translateX(${(mouseX - 0.5) * 30}px)`;
+                });
+
+                // Make farmer look toward mouse
+                const farmer = document.querySelector('.bg-farmer');
+                if (farmer) {
+                    if (mouseX > 0.5) {
+                        farmer.style.transform = 'scaleX(1)';
+                    } else {
+                        farmer.style.transform = 'scaleX(-1)';
+                    }
+                }
+            });
+        }
+
+        // Function to add toast notification
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification animate__animated animate__fadeIn';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.replace('animate__fadeIn', 'animate__fadeOut');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 1000);
+            }, 3000);
+        }
+
+        // Make windmill speed up on click
+        document.addEventListener('DOMContentLoaded', function() {
+            const windmill = document.querySelector('.bg-windmill');
+            if (windmill) {
+                windmill.style.cursor = 'pointer';
+                windmill.addEventListener('click', function() {
+                    // Can't select pseudo-elements directly, so we add class to parent
+                    windmill.classList.add('windmill-spin');
+                    showToast('💨 Windmill spinning faster!');
+                    setTimeout(() => {
+                        windmill.classList.remove('windmill-spin');
+                    }, 5000);
+                });
+            }
+        });
+
+
+
+        // Train Model Button
+        document.getElementById('train-model-btn').addEventListener('click', function() {
+            const spinner = document.getElementById('model-spinner');
+            const errorDiv = document.getElementById('model-error');
+            const trainBtn = this;
+
+            spinner.style.display = 'flex';
+            errorDiv.classList.add('d-none');
+            trainBtn.disabled = true;
+
+            fetch('/train_model', {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+                spinner.style.display = 'none';
+                trainBtn.disabled = false;
+
+                if (data.status === 'success') {
+                    // Show training results
+                    document.getElementById('training-results-section').style.display = 'block';
+                    document.getElementById('training-message').textContent = data.message;
+                    document.getElementById('mse-value').textContent = data.metrics.mse;
+                    document.getElementById('mae-value').textContent = data.metrics.mae;
+                    document.getElementById('r2-value').textContent = data.metrics.r2;
+
+                    // Create training history charts if history data is available
+                    if (data.history) {
+                        createTrainingCharts(data.history);
+                    }
+
+                    // Scroll to results
+                    document.getElementById('training-results-section').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else {
+                    errorDiv.textContent = data.message;
+                    errorDiv.classList.remove('d-none');
+                }
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                trainBtn.disabled = false;
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.classList.remove('d-none');
+            });
+        });
+
+        // Function to create training history charts
+        function createTrainingCharts(history) {
+            // Loss chart
+            const lossCtx = document.getElementById('lossChart').getContext('2d');
+            new Chart(lossCtx, {
+                type: 'line',
+                data: {
+                    labels: history.epochs,
+                    datasets: [
+                        {
+                            label: 'Training Loss',
+                            data: history.train_loss,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Validation Loss',
+                            data: history.val_loss,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Loss (MSE)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Epoch'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // MAE chart
+            const maeCtx = document.getElementById('maeChart').getContext('2d');
+            new Chart(maeCtx, {
+                type: 'line',
+                data: {
+                    labels: history.epochs,
+                    datasets: [
+                        {
+                            label: 'Training MAE',
+                            data: history.train_mae,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Validation MAE',
+                            data: history.val_mae,
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Mean Absolute Error'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Epoch'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+
+        // Water Calculator Form
+        document.getElementById('water-calculator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const spinner = document.getElementById('water-spinner');
+            const irrigationType = document.getElementById('irrigation-type').value;
+            const area = document.getElementById('area').value;
+            const cropType = document.getElementById('crop-type').value;
+            const growthStage = document.getElementById('growth-stage').value;
+            const soilType = document.getElementById('soil-type').value;
+            const weatherCondition = document.getElementById('weather-condition').value;
+
+            spinner.style.display = 'flex';
+
+            fetch('/calculate_water', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    irrigation_type: irrigationType,
+                    area: area,
+                    crop_type: cropType,
+                    growth_stage: growthStage,
+                    soil_type: soilType,
+                    weather_condition: weatherCondition
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                spinner.style.display = 'none';
+
+                if (data.status === 'success') {
+                    // Show water results
+                    document.getElementById('water-results-section').style.display = 'block';
+
+                    // Update current conditions
+                    document.getElementById('current-temp').textContent = data.current_conditions.temperature;
+                    document.getElementById('current-humidity').textContent = data.current_conditions.humidity;
+                    document.getElementById('current-weather').textContent = data.current_conditions.weather;
+
+                    // Update prediction
+                    document.getElementById('prediction-date').textContent = data.prediction.date;
+                    document.getElementById('prediction-temp').textContent = data.prediction.temperature;
+                    document.getElementById('prediction-humidity').textContent = data.prediction.humidity;
+                    document.getElementById('prediction-source').textContent = data.prediction.prediction_source;
+
+                    // Update irrigation recommendation
+                    document.getElementById('water-required').textContent = data.irrigation.water_required_liters;
+                    document.getElementById('duration-minutes').textContent = data.irrigation.duration_minutes;
+                    document.getElementById('optimal-time').textContent = data.irrigation.optimal_time;
+                    document.getElementById('frequency').textContent = data.irrigation.frequency;
+                    document.getElementById('sessions').textContent = data.irrigation.sessions;
+                    document.getElementById('session-duration').textContent = data.irrigation.session_duration;
+
+                    // Update crop and soil info
+                    document.getElementById('crop-info-type').textContent = data.crop_info.type;
+                    document.getElementById('crop-info-stage').textContent = data.crop_info.growth_stage;
+                    document.getElementById('crop-info-water').textContent = data.crop_info.base_water_need;
+                    document.getElementById('soil-info-type').textContent = data.soil_properties.type;
+
+                    // Scroll to results
+                    document.getElementById('water-results-section').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                alert('Error: ' + error.message);
+            });
+        });
+
+        // Daily Sensor Collection Schedule Form
+        document.getElementById('schedule-collection-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const collectionTime = document.getElementById('collection-time').value;
+            const autoTrain = document.getElementById('auto-train').checked;
+
+            fetch('/schedule_daily_collection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    collection_time: collectionTime,
+                    auto_train: autoTrain
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const statusDiv = document.getElementById('schedule-status');
+                    const messageSpan = document.getElementById('schedule-message');
+
+                    statusDiv.style.display = 'block';
+                    statusDiv.className = 'alert alert-success mt-3';
+                    messageSpan.textContent = data.message;
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+
+        // Train After Submit button
+        document.getElementById('train-after-submit').addEventListener('click', function() {
+            localStorage.setItem('action_after_submit', 'train');
+            alert('The model will be trained automatically after submitting sensor data.');
+        });
+
+        // Predict After Submit button
+        document.getElementById('predict-after-submit').addEventListener('click', function() {
+            localStorage.setItem('action_after_submit', 'predict');
+            alert('Growth prediction will be run automatically after submitting sensor data.');
+        });
+
+        // Add a button to predict growth
+        const predictGrowthBtn = document.createElement('button');
+        predictGrowthBtn.id = 'predict-growth-btn';
+        predictGrowthBtn.className = 'btn btn-success btn-action mt-3';
+        predictGrowthBtn.innerHTML = '<i class="bi bi-graph-up"></i> Predict Growth';
+
+        // Insert the button after the train model button
+        const trainModelBtn = document.getElementById('train-model-btn');
+        trainModelBtn.parentNode.insertBefore(predictGrowthBtn, trainModelBtn.nextSibling);
+
+        // Add event listener for the predict growth button
+        document.getElementById('predict-growth-btn').addEventListener('click', function() {
+            const spinner = document.getElementById('model-spinner');
+            const errorDiv = document.getElementById('model-error');
+            const predictBtn = this;
+
+            spinner.style.display = 'flex';
+            errorDiv.classList.add('d-none');
+            predictBtn.disabled = true;
+
+            fetch('/predict_growth', {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+                spinner.style.display = 'none';
+                predictBtn.disabled = false;
+
+                if (data.status === 'success') {
+                    // Show prediction results
+                    document.getElementById('prediction-results-section').style.display = 'block';
+
+                    // Update current values
+                    document.getElementById('current-growth-temp').textContent = data.current.temperature;
+                    document.getElementById('current-growth-humidity').textContent = data.current.humidity;
+
+                    // Update prediction values
+                    document.getElementById('prediction-growth-date').textContent = data.prediction.date;
+                    document.getElementById('prediction-growth-temp').textContent = data.prediction.temperature;
+                    document.getElementById('prediction-growth-humidity').textContent = data.prediction.humidity;
+
+                    // Scroll to results
+                    document.getElementById('prediction-results-section').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else {
+                    errorDiv.textContent = data.message;
+                    errorDiv.classList.remove('d-none');
+                }
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                predictBtn.disabled = false;
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.classList.remove('d-none');
+            });
+        });
+
+        // Growth chart functionality has been removed
+    </script>
+</body>
+</html>

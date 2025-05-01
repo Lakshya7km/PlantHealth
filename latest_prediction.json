@@ -1,0 +1,1 @@
+{"status": "success", "prediction": {"date": "2025-05-02", "temperature": 28.3, "humidity": 54.4, "daily_growth": 13.3, "trend": "Improving", "trend_icon": "bi-arrow-up-circle-fill text-success", "growth_change": 3.4}, "current": {"temperature": 42.0, "humidity": 60.0, "daily_growth": 9.9}}
