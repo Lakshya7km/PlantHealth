@@ -8,7 +8,7 @@ import tensorflow as tf
 
 # Initialize Supabase client (replace with your details)
 url = "https://lcmsxmciopzkdldekbmw.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjbXN4bWNpb3B6a2RsZGVrYm13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2OTk2MTgsImV4cCI6MjA1OTI3NTYxOH0.mPPJbRQNN-rNLnZfMEpJ2siWgD9TtnWnEYj91broSMA"
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjbXN4bWNpb3B6a2RsZGVrYm13Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MzY5OTYxOCwiZXhwIjoyMDU5Mjc1NjE4fQ.zAA8DtBU2qR12mLE1ldMY0iypQYc1OnJ1ndBHVVlpDk"
 supabase = create_client(url, key)
 
 # Fetch recent data from Supabase
